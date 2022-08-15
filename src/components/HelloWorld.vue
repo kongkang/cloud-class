@@ -1,40 +1,75 @@
-<script setup>
-import { ref } from 'vue'
-
-defineProps({
-  msg: String
-})
-
-const count = ref(0)
-</script>
-
 <template>
-  <h1>{{ msg }}</h1>
-
-  <p>
-    Recommended IDE setup:
-    <a href="https://code.visualstudio.com/" target="_blank">VS Code</a>
-    +
-    <a href="https://github.com/johnsoncodehk/volar" target="_blank">Volar</a>
-  </p>
-
-  <p>
-    <a href="https://vitejs.dev/guide/features.html" target="_blank">
-      Vite Documentation
-    </a>
-    |
-    <a href="https://v3.vuejs.org/" target="_blank">Vue 3 Documentation</a>
-  </p>
-
-  <button type="button" @click="count++">count is: {{ count }}</button>
-  <p>
-    Edit
-    <code>components/HelloWorld.vue</code> to test hot module replacement.
-  </p>
+	<n-space vertical class="testWrap">
+		<h1>{{ msg }}</h1>
+		<n-alert type="info" v-if="isTeacher">只有老师可见</n-alert>
+		<p>uid:{{ uid }}</p>
+		<p>teacherUid:{{ teacherUid }}</p>
+		<p>isTeacher:{{ isTeacher }}</p>
+		<n-button @click="testSDK" type="primary">老师可用: {{ count }}</n-button>
+		<n-button @click="testStore" type="warning">切换页面</n-button>
+	</n-space>
 </template>
 
+<script setup>
+	import { useMessage, NButton, NAlert, NSpace } from "naive-ui";
+	import { ref, inject, onMounted, computed, watchEffect } from "vue";
+
+	const $message = useMessage();
+	defineProps({
+		msg: String,
+	});
+
+	const context = inject("context");
+	const storage = context.createStorage("count", { count: 0 });
+	console.log(context, context.getBox(), storage);
+	const real_count = ref(storage.state.count);
+	const uid = computed(() => {
+		let room = context.getRoom();
+		console.warn({ room });
+		return room.uid;
+	});
+	const teacherUid = computed(() => {
+		let room = context.getAttributes();
+		return room.teacherUid;
+	});
+	const isTeacher = computed(() => {
+		let attr = context.getAttributes();
+		console.warn({ attr });
+		return attr.teacherUid == uid.value;
+	});
+	const count = computed({
+		get: () => {
+			return real_count.value;
+		},
+		set(v) {
+			storage.setState({ count: v });
+		},
+	});
+
+	const testSDK = () => {
+		console.log(count.value);
+		if (!isTeacher.value) {
+			return $message.info("只有老师才可以操作");
+		}
+		count.value++;
+	};
+
+	const testStore = () => {
+		console.log('test donw');
+	};
+	onMounted(() => {
+		storage.addStateChangedListener(() => {
+			console.warn("state changed", storage.state.count);
+			real_count.value = storage.state.count;
+		});
+	});
+	watchEffect(() => {
+		console.log("App.vue: count =", count.value);
+	});
+</script>
+
 <style scoped>
-a {
-  color: #42b983;
+.testWrap {
+	padding: 20px;
 }
 </style>

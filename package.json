@@ -9,20 +9,25 @@
   },
   "dependencies": {
     "@multiavatar/multiavatar": "^1.0.7",
+    "@netless/fastboard": "^0.3.6",
+    "@netless/window-manager": "^0.4.38",
     "@vicons/fluent": "^0.12.0",
     "@vicons/tabler": "^0.12.0",
     "axios": "^0.26.1",
     "fs": "^0.0.1-security",
     "guacamole-common-js": "^1.4.0-a",
     "js-md5": "^0.7.3",
+    "naive-ui": "^2.32.1",
     "normalize.css": "^8.0.1",
     "parse": "^3.4.1",
+    "path": "^0.12.7",
     "qrcode.vue": "^3.3.3",
     "vue": "^3.2.25",
     "vue-clipboard3": "^2.0.0",
     "vue-fullscreen": "^2.6.1",
-    "vue-router": "^4.0.12",
-    "vuex": "^4.0.2"
+    "vue-router": "^4.1.3",
+    "vuex": "^4.0.2",
+    "white-web-sdk": "^2.16.33"
   },
   "devDependencies": {
     "@vicons/antd": "^0.12.0",
@@ -31,7 +36,6 @@
     "@vicons/ionicons5": "^0.12.0",
     "@vicons/material": "^0.12.0",
     "@vitejs/plugin-vue": "^2.3.0",
-    "naive-ui": "^2.30.3",
     "sass": "^1.49.9",
     "vfonts": "^0.0.3",
     "vite": "^2.9.0"

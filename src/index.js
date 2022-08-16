@@ -27,7 +27,7 @@ const CloudClassApp = {
             teacherUid: 'kongkang'
         });
 
-        const app = createApp(App).provide("context", context);
+        const app = createApp(App).provide("context", context).provide("box", box);
 
         app.mount($content);
 

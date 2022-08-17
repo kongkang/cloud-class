@@ -22,7 +22,7 @@
 		(ev) => {
 			if (ev.data.token){
                 emit("update:data", ev.data);
-                emit("router", ev.data.path || "Dashboard");
+                emit("router", ev.data.path || "Home");
             }
 		},
 		false

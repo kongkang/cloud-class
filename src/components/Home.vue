@@ -1,12 +1,13 @@
 <template>
 	<n-space vertical class="testWrap">
 		<template v-if="data.isTeacher">
-			<h1>云教室：课前准备: {{data.classObj.status}}</h1>
+			<h1>云教室：课前准备</h1>
 			<n-alert :type="classStatusArr[data.classObj.status] && classStatusArr[data.classObj.status].type || 'warning'" title="当前状态">
 				{{classStatusArr[data.classObj.status] && classStatusArr[data.classObj.status].msg || '等待选择实操课'}}
 			</n-alert>
 			<n-space align="center">
 				<n-text type="default">课前准备：</n-text>
+				<n-button @click="emit('update:data', {classObj: {status: 1}})" type="primary">开始</n-button>
 				<n-cascader
 					:value="data.classObj"
 					:placeholder="'请选择实操课程'"
@@ -130,7 +131,7 @@
 						});
 					},
 					(err) => {
-						emit("router", { router: "Iframe", redirect: "Home" });
+						// emit("router", { router: "Iframe", redirect: "Home" });
 					}
 				);
 		} else {
@@ -146,7 +147,7 @@
 					});
 				},
 				(err) => {
-					emit("router", { router: "Iframe", redirect: "Home" });
+					// emit("router", { router: "Iframe", redirect: "Home" });
 				}
 			);
 		}

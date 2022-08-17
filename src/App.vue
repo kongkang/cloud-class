@@ -3,7 +3,7 @@
 		<n-message-provider>
 			<n-tag type="warning" class="testRouter">{{ $store.state }}</n-tag>
 			<n-tag type="info" class="testData">{{
-				{ uid, teacherUid, isTeacher, redirect, classObj: classObj.id }
+				{ uid, teacherUid, isTeacher, redirect, classObj: (classObj && classObj.id || "") }
 			}}</n-tag>
 			<component
 				:is="router"
@@ -39,10 +39,16 @@
 	const redirect = ref("");
 	const context = inject("context");
 	const box = inject("box");
-	const $store = context.createStorage("router", {
+	// const $store = context.storage;
+	// $store.ensureState({
+	// 	router: "Home",
+	// 	classObj: {},
+	// });
+	const $store = context.createStorage("cloudclass", {
 		router: "Home",
-		classObj: "",
+		classObj: {},
 	});
+	console.warn('ensureState', JSON.stringify($store.state));
 	const real_router = ref($store.state.router);
 	const real_classObj = ref($store.state.classObj);
 	const real_state = computed(() => {
@@ -63,7 +69,7 @@
 		},
 		set(v) {
 			if (v) {
-				if (isTeacher.value) {
+				if (isTeacher.value || real_classObj.value == null) {
 					real_router.value = v;
 					$store.setState({ router: v });
 					return;
@@ -94,7 +100,7 @@
 		set(v) {
 			console.warn("classObj:", v);
 			real_classObj.value = v;
-			$store.setState({ classObj: v });
+			let setArr = {classObj: v};
 			if (isTeacher.value == false) {
 				console.log("isTeacher:", isTeacher.value);
 				let r = "Home";
@@ -102,8 +108,9 @@
 					r = "Screen";
 				}
 				real_router.value = r;
-				$store.setState({ router: r });
+				setArr.router = r;
 			}
+			$store.setState(setArr);
 		},
 	});
 
@@ -141,7 +148,9 @@
 			if (!isTeacher.value && router.value != $store.state.router) {
 				router.value = $store.state.router;
 			}
-			classObj.value = $store.state.classObj;
+			if ($store.state.classObj){
+				classObj.value = $store.state.classObj;
+			}
 		});
 		if (!isTeacher.value) {
 			box.setReadonly(true);

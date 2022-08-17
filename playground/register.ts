@@ -16,6 +16,6 @@ apps.push({
 		if (Object.values(fastboard.manager.apps).find(app => app.kind === App.kind)) {
 			return false;
 		}
-		fastboard.manager.addApp(App);
+		fastboard.manager.addApp(Object.assign({}, App));
 	},
 });

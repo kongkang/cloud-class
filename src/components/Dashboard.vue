@@ -2,10 +2,7 @@
     <n-space vertical>
         <h1>Dashboard: {{data.uid}}</h1>
 		<n-button @click="emit('router', {router:'Home'})" type="warning"
-			>切换页面(Home)</n-button
-		>
-		<n-button @click="emit('router', {router:'Screen'})" type="warning"
-			>切换页面(Screen)</n-button
+			>返回（Home）</n-button
 		>
     </n-space>
 </template>

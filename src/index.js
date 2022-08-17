@@ -22,10 +22,6 @@ const CloudClassApp = {
         const $content = document.createElement("div");
         $content.className = "app-cloud-class";
         box.mountContent($content);
-        console.warn({ box, context });
-        context.setAttributes({
-            teacherUid: 'kongkang'
-        });
 
         const app = createApp(App).provide("context", context).provide("box", box);
 

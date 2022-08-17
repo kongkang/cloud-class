@@ -12,6 +12,9 @@ export const config = {
             list: '/cloudclass/list',
             start: '/cloudclass/start',
             end: '/cloudclass/end',
+        },
+        practice: {
+            start: '/practice/start',
         }
     },
 };
@@ -61,6 +64,9 @@ export const requestAPI = async (method, url, params) => {
     }
     return null;
 };
+export const isLogin = () => {
+    return !!axios.defaults.headers.common["Authorization"];
+};
 export const setToken = (token) => {
     axios.defaults.headers.common["Authorization"] = token;
 };
@@ -82,8 +88,13 @@ export const api = {
         start: ({ cloudClassId }) => {
             return requestAPI("post", config.api.cloudclass.start, { cloudClassId }).then(checkApiData);
         },
-        end: ({cloudClassId}) => {
+        end: ({ cloudClassId }) => {
             return requestAPI("post", config.api.cloudclass.end, { cloudClassId }).then(checkApiData);
         },
     },
+    practice: {
+        join: ({ cloudClassId }) => {
+            return requestAPI("post", config.api.practice.start, { cloudClassId }).then(checkApiData);
+        }
+    }
 };

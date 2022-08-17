@@ -2,32 +2,42 @@
 	<n-space vertical class="testWrap">
 		<template v-if="data.isTeacher">
 			<h1>云教室：课前准备</h1>
-			<n-alert :type="classStatusArr[data.classObj.status] && classStatusArr[data.classObj.status].type || 'warning'" title="当前状态">
-				{{classStatusArr[data.classObj.status] && classStatusArr[data.classObj.status].msg || '等待选择实操课'}}
+			<n-alert
+				:type="
+					(classStatusArr[data.classObj.status] &&
+						classStatusArr[data.classObj.status].type) ||
+					'warning'
+				"
+				title="当前状态"
+			>
+				{{
+					(classStatusArr[data.classObj.status] &&
+						classStatusArr[data.classObj.status].msg) ||
+					"等待选择实操课"
+				}}
 			</n-alert>
 			<n-space align="center">
 				<n-text type="default">课前准备：</n-text>
-				<n-button @click="emit('update:data', {classObj: {status: 1}})" type="primary">开始</n-button>
 				<n-cascader
-					:value="data.classObj"
-					:placeholder="'请选择实操课程'"
+					:value="(data.classObj && data.classObj.id) || ''"
+					placeholder="请选择实操课程"
 					expand-trigger="click"
 					:options="options"
 					check-strategy="child"
 					remote
 					:on-load="optionsLoader"
 					@update:value="selectClassObjFn"
-					v-if="!data.classObj"
+					v-if="!hasClassId"
 				></n-cascader>
 				<n-tag
 					type="primary"
-					v-else
 					closable
-					@click="emit('update:data', { classObj: '' })"
+					v-else
+					@close="emit('update:data', { classObj: '' })"
 					>{{ data.classObj.title }}</n-tag
 				>
 			</n-space>
-			<template v-if="data.classObj">
+			<template v-if="hasClassId">
 				<n-space align="center">
 					<n-text type="default">课中操作：</n-text>
 					<n-button
@@ -37,26 +47,17 @@
 					>
 						开始实操
 					</n-button>
-					<n-button
-						@click="endClassFn"
-						type="error"
-						v-if="data.classObj.status == 1"
-					>
-						结束实操
-					</n-button>
-					<n-button
-						@click="watchClassFn"
-						type="info"
-						v-if="data.classObj.status == 1"
-					>
-						观察学生
-					</n-button>
-					<n-button @click="watchClassFn" type="info"> 查看作业 </n-button>
+					<template v-if="data.classObj.status == 1">
+						<n-button @click="endClassFn" type="error"> 结束实操 </n-button>
+						<n-button @click="watchClassFn" type="info">
+							观察实操列表
+						</n-button>
+						<n-button @click="afterClassFn" type="info">
+							观察实操个人
+						</n-button>
+					</template>
 				</n-space>
-				<n-space
-					align="center"
-					v-if="data.classObj && data.classObj.status == 2"
-				>
+				<n-space align="center" v-if="hasClassId && data.classObj.status == 2">
 					<n-text type="default">课后作业：</n-text>
 					<n-button @click="afterClassFn" type="success"> 授权作业 </n-button>
 				</n-space>
@@ -64,11 +65,22 @@
 		</template>
 		<template v-else>
 			<h1>云教室</h1>
-			<n-alert :type="classStatusArr[data.classObj.status] && classStatusArr[data.classObj.status].type || 'warning'" title="当前状态">
-				{{classStatusArr[data.classObj.status] && classStatusArr[data.classObj.status].msg || '等待选择实操课'}}
+			<n-alert
+				:type="
+					(classStatusArr[data.classObj.status] &&
+						classStatusArr[data.classObj.status].type) ||
+					'warning'
+				"
+				title="当前状态"
+			>
+				{{
+					(classStatusArr[data.classObj.status] &&
+						classStatusArr[data.classObj.status].msg) ||
+					"等待选择实操课"
+				}}
 			</n-alert>
-			<n-space>
-				<n-button type="warning" @click="connectionFn">举手</n-button>
+			<n-space v-if="data.classObj.status==1">
+				<n-button type="warning" @click="startPracticeFn">开始实操</n-button>
 			</n-space>
 		</template>
 	</n-space>
@@ -88,17 +100,17 @@
 	import { api } from "@/components/API";
 	const classStatusArr = {
 		0: {
-			type: 'info',
-			msg: '等待开始'
+			type: "info",
+			msg: "等待开始",
 		},
 		1: {
-			type: 'success',
-			msg: '实操课，练习中'
+			type: "success",
+			msg: "实操课，练习中",
 		},
 		2: {
-			type: 'error',
-			msg: '练习结束，等待点评'
-		}
+			type: "error",
+			msg: "练习结束，等待点评",
+		},
 	};
 
 	const $message = useMessage();
@@ -107,6 +119,9 @@
 	});
 	const data = computed(() => {
 		return props.data;
+	});
+	const hasClassId = computed(() => {
+		return !!(data.value.classObj && data.value.classObj.id);
 	});
 	const emit = defineEmits(["router", "update:data"]);
 
@@ -131,10 +146,14 @@
 						});
 					},
 					(err) => {
-						// emit("router", { router: "Iframe", redirect: "Home" });
+						console.error(err);
+						emit("router", { router: "Login", redirect: "Home" });
 					}
 				);
 		} else {
+			if (options.value.length > 0) {
+				return;
+			}
 			api.homework.list().then(
 				(data) => {
 					console.log(data);
@@ -145,14 +164,22 @@
 							isLeaf: false,
 						};
 					});
+					options.value.unshift({
+						label: "请选择实操课",
+						value: "",
+						isLeaf: true,
+						disabled: true,
+					});
 				},
 				(err) => {
-					// emit("router", { router: "Iframe", redirect: "Home" });
+					console.error(err);
+					emit("router", { router: "Login", redirect: "Home" });
 				}
 			);
 		}
 	};
 	optionsLoader();
+	const classObj = ref("");
 	const selectClassObjFn = (v, opt) => {
 		if (!data.value.isTeacher) {
 			return $message.info("只有老师才可以操作");
@@ -195,10 +222,11 @@
 		emit("router", { router: "Dashboard" });
 	};
 	const afterClassFn = (v) => {
-		emit("router", {router: "Screen"});
+		emit("router", { router: "Screen" });
 	};
-	const connectionFn = () => {
-		console.log("connectionFn");
+
+	const startPracticeFn = (v) => {
+		emit("router", { router: "Screen" });
 	};
 </script>
 

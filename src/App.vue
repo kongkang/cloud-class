@@ -1,9 +1,17 @@
 <template>
 	<n-config-provider :theme="themeMode" :locale="zhCN" :date-locale="dateZhCN">
 		<n-message-provider>
-			<n-tag type="warning" class="testRouter">{{ $store.state }}</n-tag>
+			<n-tag type="warning" class="testRouter"
+				>{{ real_router }}{{ $store.state }}</n-tag
+			>
 			<n-tag type="info" class="testData">{{
-				{ uid, teacherUid, isTeacher, redirect, classObj: (classObj && classObj.id || "") }
+				{
+					uid,
+					teacherUid,
+					isTeacher,
+					redirect,
+					classObj: (classObj && classObj.id) || "",
+				}
 			}}</n-tag>
 			<component
 				:is="router"
@@ -21,8 +29,8 @@
 	import Home from "./components/Home.vue";
 	import Screen from "./components/Screen.vue";
 	import Dashboard from "./components/Dashboard.vue";
-	import Iframe from "./components/Iframe.vue";
-	import { setToken, api } from "./components/API";
+	import Login from "./components/Login.vue";
+	import { setToken, api, isLogin } from "./components/API";
 
 	import {
 		NMessageProvider,
@@ -48,32 +56,25 @@
 		router: "Home",
 		classObj: {},
 	});
-	console.warn('ensureState', JSON.stringify($store.state));
 	const real_router = ref($store.state.router);
 	const real_classObj = ref($store.state.classObj);
-	const real_state = computed(() => {
-		return {
-			router: real_router.value,
-			classObj: real_classObj.value,
-		};
-	});
+	const actions = {
+		Login,
+		Home,
+		Screen,
+		Dashboard,
+	};
 	const router = computed({
 		get() {
-			const actions = {
-				Iframe,
-				Home,
-				Screen,
-				Dashboard,
-			};
+			if (isLogin() && !isTeacher.value && classObj.value.status == 1){
+				return Screen;
+			}
 			return actions[real_router.value];
 		},
 		set(v) {
 			if (v) {
-				if (isTeacher.value || real_classObj.value == null) {
-					real_router.value = v;
-					$store.setState({ router: v });
-					return;
-				}
+				real_router.value = v;
+				$store.setState({ router: v });
 			}
 		},
 	});
@@ -98,27 +99,25 @@
 			return real_classObj.value;
 		},
 		set(v) {
+			if (v.id == real_classObj.value.id && v.status == real_classObj.value.status) {
+				return console.warn("classObj, 啥也没变");
+			}
 			console.warn("classObj:", v);
 			real_classObj.value = v;
-			let setArr = {classObj: v};
-			if (isTeacher.value == false) {
-				console.log("isTeacher:", isTeacher.value);
-				let r = "Home";
-				if (v.status == 1) {
-					r = "Screen";
-				}
-				real_router.value = r;
-				setArr.router = r;
-			}
-			$store.setState(setArr);
+			$store.setState({ classObj: v });
 		},
 	});
 
 	const routerFn = (action) => {
-		console.log("routerFn", action);
+		console.warn("routerFn-1", action);
+		if (!actions[action.router]) {
+			action.router = "Home";
+		}
+		console.warn("routerFn-2", action);
+		// return false;
 		router.value = action.router;
 		action.redirect &&
-			action.redirect != "Iframe" &&
+			action.redirect != "Login" &&
 			(redirect.value = action.redirect);
 	};
 	const updateDataFn = (v) => {
@@ -132,7 +131,6 @@
 				.detail()
 				.then((res) => {
 					console.log("userinfo", res);
-					routerFn({ router: redirect.value });
 				})
 				.catch((err) => {
 					console.log("userinfo", err);
@@ -144,11 +142,12 @@
 	};
 	onMounted(() => {
 		$store.addStateChangedListener(() => {
-			console.warn("state changed", $store.state.router);
 			if (!isTeacher.value && router.value != $store.state.router) {
+				console.warn("router changed", $store.state.router);
 				router.value = $store.state.router;
 			}
-			if ($store.state.classObj){
+			if ($store.state.classObj) {
+				console.warn("classObj changed", $store.state.classObj);
 				classObj.value = $store.state.classObj;
 			}
 		});
@@ -158,6 +157,7 @@
 	});
 	watchEffect(() => {
 		console.log("App.vue: router =", router.value);
+		console.log("App.vue: classObj =", classObj.value);
 	});
 </script>
 
@@ -175,6 +175,12 @@
 		left: 5px;
 		top: 5px;
 		z-index: 999;
+		width: 30%;
+		overflow: hidden;
+		white-space: pre-wrap;
+		height: auto;
+		text-align: left;
+		pointer-events: none;
 	}
 	.testData {
 		left: auto;

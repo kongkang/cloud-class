@@ -1,25 +1,40 @@
 <template>
 	<n-config-provider :theme="themeMode" :locale="zhCN" :date-locale="dateZhCN">
-		<n-message-provider>
-			<n-tag type="warning" class="testRouter"
-				>{{ real_router }}{{ $store.state }}</n-tag
-			>
-			<n-tag type="info" class="testData">{{
-				{
-					uid,
-					teacherUid,
-					isTeacher,
-					redirect,
-					classObj: (classObj && classObj.id) || "",
-				}
-			}}</n-tag>
-			<component
-				:is="router"
-				:data="{ uid, teacherUid, isTeacher, redirect, classObj }"
-				@router="routerFn"
-				@update:data="updateDataFn"
-			/>
-		</n-message-provider>
+		<n-dialog-provider>
+			<n-message-provider>
+				<n-tag type="info" class="testData"
+					>{{
+						{
+							router: $store.state.router,
+							uid,
+							teacherUid,
+							isTeacher,
+							redirect,
+							classObj: (classObj && classObj.id) || "",
+							classObj_status: (classObj && classObj.status) || "",
+							practiceObj: (practiceObj && practiceObj.id) || "",
+						}
+					}}<br />---<br />{{
+						Object.keys($store.state).map((k) => {
+							return [k, typeof $store.state[k]];
+						})
+					}}</n-tag
+				>
+				<component
+					:is="router"
+					:data="{
+						uid,
+						teacherUid,
+						isTeacher,
+						redirect,
+						classObj,
+						practiceObj,
+					}"
+					@router="routerFn"
+					@update:data="updateDataFn"
+				/>
+			</n-message-provider>
+		</n-dialog-provider>
 	</n-config-provider>
 </template>
 
@@ -34,6 +49,7 @@
 
 	import {
 		NMessageProvider,
+		NDialogProvider,
 		NConfigProvider,
 		NTag,
 		NSpace,
@@ -42,9 +58,17 @@
 		zhCN,
 		dateZhCN,
 	} from "naive-ui";
-	import { ref, inject, onMounted, computed, watchEffect, watch } from "vue";
+	import {
+		ref,
+		shallowRef,
+		inject,
+		onMounted,
+		computed,
+		watchEffect,
+		watch,
+	} from "vue";
 
-	const redirect = ref("");
+	const redirect = shallowRef("");
 	const context = inject("context");
 	const box = inject("box");
 	// const $store = context.storage;
@@ -55,9 +79,12 @@
 	const $store = context.createStorage("cloudclass", {
 		router: "Home",
 		classObj: {},
+		practiceObj: {},
 	});
 	const real_router = ref($store.state.router);
 	const real_classObj = ref($store.state.classObj);
+	const real_practiceObj = ref($store.state.practiceObj);
+	const userInfo = ref(null);
 	const actions = {
 		Login,
 		Home,
@@ -66,7 +93,11 @@
 	};
 	const router = computed({
 		get() {
-			if (isLogin() && !isTeacher.value && classObj.value.status == 1){
+			if (
+				real_router.value != "Login" &&
+				!isTeacher.value &&
+				classObj.value.status == 1
+			) {
 				return Screen;
 			}
 			return actions[real_router.value];
@@ -99,12 +130,31 @@
 			return real_classObj.value;
 		},
 		set(v) {
-			if (v.id == real_classObj.value.id && v.status == real_classObj.value.status) {
+			if (
+				v.id == real_classObj.value.id &&
+				v.status == real_classObj.value.status
+			) {
 				return console.warn("classObj, 啥也没变");
 			}
 			console.warn("classObj:", v);
 			real_classObj.value = v;
 			$store.setState({ classObj: v });
+		},
+	});
+	const practiceObj = computed({
+		get() {
+			return real_practiceObj.value;
+		},
+		set(v) {
+			if (
+				v.id == real_practiceObj.value.id &&
+				v.status == real_practiceObj.value.status
+			) {
+				return console.warn("practiceObj, 啥也没变");
+			}
+			console.warn("practiceObj:", v);
+			real_practiceObj.value = v;
+			$store.setState({ practiceObj: v });
 		},
 	});
 
@@ -125,19 +175,26 @@
 		if (v.classObj !== undefined) {
 			classObj.value = v.classObj;
 		}
+		if (v.practiceObj !== undefined) {
+			practiceObj.value = v.practiceObj;
+		}
+		if (v.practice) {
+			console.log(v.practice);
+		}
+		if (v.comment) {
+			$store.setState({
+				'action': {
+					type: 'checkPractice',
+					value: v.comment
+				}
+			});
+		}
 		if (v.token) {
-			setToken(v.token);
-			api.userinfo
-				.detail()
-				.then((res) => {
-					console.log("userinfo", res);
+			setToken(v.token)
+				.then((data) => {
+					userInfo.value = data;
 				})
-				.catch((err) => {
-					console.log("userinfo", err);
-				})
-				.finally(() => {
-					console.log("userinfo", "finally");
-				});
+				.catch(console.error);
 		}
 	};
 	onMounted(() => {
@@ -173,7 +230,7 @@
 	.testData {
 		position: absolute;
 		left: 5px;
-		top: 5px;
+		bottom: 5px;
 		z-index: 999;
 		width: 30%;
 		overflow: hidden;

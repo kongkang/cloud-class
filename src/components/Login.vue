@@ -4,17 +4,17 @@
 
 <script setup>
 	import { ref, computed } from "vue";
+	import { isLogin, isApiLogin, config } from "@/components/API";
+	import { useMessage } from "naive-ui";
+	const $message = useMessage();
 	const { data } = defineProps({
 		data: Object,
 	});
 	const emit = defineEmits(["update:data", "router"]);
 	const ccUrl = computed(() => {
-		return (
-			"https://local.cloudos.com:3000/loginInFlat?flat=" +
-			data.uid +
-			"&redirect=" +
-			(data.redirect || "Home")
-		);
+		return `${config.wwwUrl}/loginInFlat?flat=${data.uid}&redirect=${
+			data.redirect || "Home"
+		}`;
 	});
 	const iframeRef = ref(null);
 	// https://juejin.cn/post/6962901957895782413
@@ -23,12 +23,21 @@
 		(ev) => {
 			console.warn(ev.data);
 			if (ev.data.token) {
+				$message.success("登陆成功");
 				emit("update:data", ev.data);
 				emit("router", { router: ev.data.path });
 			}
 		},
 		false
 	);
+	const initPage = async () => {
+		const isLogin = await isApiLogin();
+		if (isLogin) {
+			$message.success("已登录");
+			emit("router", { router: data.redirect || "Home" });
+		}
+	};
+	initPage();
 </script>
 
 <style lang="scss">

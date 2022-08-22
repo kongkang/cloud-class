@@ -18,43 +18,52 @@
 			</n-alert>
 			<n-space align="center">
 				<n-text type="default">课前准备：</n-text>
-				<n-cascader
-					:value="(data.classObj && data.classObj.id) || ''"
-					placeholder="请选择实操课程"
-					expand-trigger="click"
-					:options="options"
-					check-strategy="child"
-					remote
-					:on-load="optionsLoader"
-					@update:value="selectClassObjFn"
-					v-if="!hasClassId"
-				></n-cascader>
-				<n-tag
-					type="primary"
-					closable
-					v-else
-					@close="emit('update:data', { classObj: '' })"
-					>{{ data.classObj.title }}</n-tag
-				>
+				<template v-if="!hasClassId">
+					<n-cascader
+						:value="(data.classObj && data.classObj.id) || ''"
+						placeholder="请选择实操课程"
+						expand-trigger="click"
+						:options="options"
+						check-strategy="child"
+						remote
+						:on-load="optionsLoader"
+						@update:value="selectClassObjFn"
+						v-if="!hasClassId"
+					></n-cascader>
+					<n-button type="info" @click="options=[];optionsLoader()"> 刷新 </n-button>
+					<n-button
+						type="warning"
+						tag="a"
+						:href="config.wwwUrl + '/homework'"
+						target="_blank"
+					>
+						备课（外链）
+					</n-button>
+				</template>
+				<template v-else>
+					<n-tag
+						type="primary"
+						closable
+						@close="emit('update:data', { classObj: '' })"
+						>{{ data.classObj.title }}</n-tag
+					>
+				</template>
 			</n-space>
 			<template v-if="hasClassId">
 				<n-space align="center">
 					<n-text type="default">课中操作：</n-text>
-					<n-button
-						@click="startClassFn"
-						type="success"
-						v-if="data.classObj.status == 0"
-					>
-						开始实操
-					</n-button>
+					<template v-if="data.classObj.status == 0">
+						<n-button @click="startClassFn" type="warning"> 实操开机 </n-button>
+						<n-button @click="startPracticeFn" type="success"> 学生上机 </n-button>
+					</template>
 					<template v-if="data.classObj.status == 1">
 						<n-button @click="endClassFn" type="error"> 结束实操 </n-button>
 						<n-button @click="watchClassFn" type="info">
 							观察实操列表
 						</n-button>
-						<n-button @click="afterClassFn" type="info">
-							观察实操个人
-						</n-button>
+					</template>
+					<template v-if="data.classObj.status == 2">
+						<n-tag>暂无</n-tag>
 					</template>
 				</n-space>
 				<n-space align="center" v-if="hasClassId && data.classObj.status == 2">
@@ -79,7 +88,7 @@
 					"等待选择实操课"
 				}}
 			</n-alert>
-			<n-space v-if="data.classObj.status==1">
+			<n-space v-if="data.classObj.status == 1">
 				<n-button type="warning" @click="startPracticeFn">开始实操</n-button>
 			</n-space>
 		</template>
@@ -97,7 +106,7 @@
 		NCascader,
 	} from "naive-ui";
 	import { ref, inject, onMounted, computed, watchEffect } from "vue";
-	import { api } from "@/components/API";
+	import { api, config, isLogin } from "@/components/API";
 	const classStatusArr = {
 		0: {
 			type: "info",
@@ -179,7 +188,6 @@
 		}
 	};
 	optionsLoader();
-	const classObj = ref("");
 	const selectClassObjFn = (v, opt) => {
 		if (!data.value.isTeacher) {
 			return $message.info("只有老师才可以操作");
@@ -193,14 +201,11 @@
 			.start({ cloudClassId: data.value.classObj.id })
 			.then((res) => {
 				console.log(res);
-				emit("update:data", {
-					classObj: Object.assign({}, data.value.classObj, {
-						status: 1,
-					}),
-				});
+				$message.success("正在开机");
 			})
 			.catch((err) => {
 				console.log(err);
+				$message.error(err.msg);
 			});
 	};
 	const endClassFn = (v) => {
@@ -226,7 +231,15 @@
 	};
 
 	const startPracticeFn = (v) => {
-		emit("router", { router: "Screen" });
+		if (data.value.isTeacher) {
+			emit("update:data", {
+				classObj: Object.assign({}, data.value.classObj, {
+					status: 1,
+				}),
+			});
+		}else{
+			emit("router", { router: "Screen" });
+		}
 	};
 </script>
 

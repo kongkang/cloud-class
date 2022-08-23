@@ -42,7 +42,7 @@
 
 前置条件：至少需要安装了 `git`、`node 16`、`npm 8`
 
-第一步：`下载项目依赖 `npm install
+第一步：下载项目依赖 `npm install`
 
 第二步：运行项目 `npm start`
 

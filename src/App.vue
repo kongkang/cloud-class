@@ -43,6 +43,7 @@
 	// Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
 	import Home from "./components/Home.vue";
 	import Screen from "./components/Screen.vue";
+	import Playback from "./components/Playback.vue";
 	import Dashboard from "./components/Dashboard.vue";
 	import Login from "./components/Login.vue";
 	import { setToken, api, isLogin } from "./components/API";
@@ -89,6 +90,7 @@
 		Login,
 		Home,
 		Screen,
+		Playback,
 		Dashboard,
 	};
 	const router = computed({

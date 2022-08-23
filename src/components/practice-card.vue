@@ -72,7 +72,7 @@
 			practiceObj: practice.value,
 		});
 		$emit("router", {
-			router: "Player",
+			router: "Playback",
 		});
 	};
 	const comment = ref("");

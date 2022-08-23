@@ -58,12 +58,11 @@
 					</template>
 					<template v-if="data.classObj.status == 1">
 						<n-button @click="endClassFn" type="error"> 结束实操 </n-button>
-						<n-button @click="watchClassFn" type="info">
-							观察实操列表
-						</n-button>
 					</template>
-					<template v-if="data.classObj.status == 2">
-						<n-tag>暂无</n-tag>
+					<template v-if="data.classObj.status >= 1">
+						<n-button @click="watchClassFn" type="info">
+							实操列表
+						</n-button>
 					</template>
 				</n-space>
 				<n-space align="center" v-if="hasClassId && data.classObj.status == 2">

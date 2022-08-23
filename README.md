@@ -1,6 +1,4 @@
-# 云教室
-
-# CloudOS+Flat云教室
+# CloudOS + Flat 云教室
 
 ## 项目简介
 
@@ -43,6 +41,8 @@
 第一步：下载项目依赖 `npm install`
 
 第二步：运行项目 `npm start`
+
+课前备课：[CloudOS-Flat-App 云教室](https://flat.app.cloudos.com/)
 
 
 ## 功能简介

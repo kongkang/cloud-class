@@ -2,8 +2,6 @@
 
 # CloudOS+Flat云教室
 
-***
-
 ## 项目简介
 
 [云教室](https://www.wolai.com/6VbKgmRk99Hgcc3aoCpkyS "云教室")是还原线下授课体验的`新一代云端实操教学系统`。
@@ -89,8 +87,6 @@
 ### 团队成员+特别感谢
 
 [@蝎紫](https://www.wolai.com/r3sYg3TTjEs4qJ7DwieDk8 "@蝎紫")
-
-***
 
 # 许可协议
 

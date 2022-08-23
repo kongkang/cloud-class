@@ -1,7 +1,97 @@
-# Vue 3 + Vite
+# 云教室
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+# CloudOS+Flat云教室
 
-## Recommended IDE Setup
+***
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
+## 项目简介
+
+[云教室](https://www.wolai.com/6VbKgmRk99Hgcc3aoCpkyS "云教室")是还原线下授课体验的`新一代云端实操教学系统`。
+
+#### 现有线上教学问题
+
+*   视频直播录播课，授课形式单一，师生互动性差，感知弱建立信任困难，转化率低；
+
+*   先教后练，教学与实操脱节，缺少老师的临场指导，学习效果很难提高；
+
+*   学习门槛高，大型学习软件价格贵，安装繁琐，电脑硬件要求高，购置费用贵；
+
+#### 解决问题&项目优势
+
+*   依托白板课堂，边学边练，学习实操同步，打破传统在线教育模式，提升互动体验；
+
+*   学习仅需要浏览器，专业软件不用安装，学员随时开机学习；
+
+*   高度还原线下教学场景，老师端可全员视角查看，实时交互指导；
+
+*   配合独创作业码功能，站内站外、录播直播、课前课后都可以兼顾，教学形式更全面；
+
+#### 应用场景
+
+*   院校实操教学，兼容电教室模式和远程教学模式；
+
+*   线上技能培训，和已有系统可无缝对接；
+
+*   在线实操面试，回放操作录像方便各级审核；
+
+*   兴趣教学，私域授课，作业码引流方便成交学员；
+
+*   政企培训，线上云系统，网络隔离，安全、隐私更有保障；
+
+## 安装部署指南
+
+\<!-- 请描述该应用的使用步骤，包括下载、依赖安装、参数及软硬件配置（如有）等 --> @蝎紫靠你了
+
+```javascript
+// 下载xxx，需要版本xxx
+
+// 安装依赖
+
+// 配置参数
+
+// 硬件配置
+
+
+```
+
+## 功能简介
+
+*   创建实操课模板，生成专用教学系统镜像，配置可选，提前准备好课件和作业素材；
+
+*   基于模板，创建实操课，支持互动白板系统内一键导入，同步实操学习状态，自动分发电脑；
+
+*   学生人手一台电脑，老师可实时查看作业进度，随时线上指导；
+
+*   学生申请连线，可授权老师操作，手把手教学；
+
+*   学生可随时练习，可提交作业，作业老师可以查看回放，并给与点评，巩固学习成果；
+
+## 技术栈
+
+*   场景化白板
+
+*   前端：VUE3
+
+*   后端：Vite+Node
+
+*   云端：阿里云（已支持），腾讯云（开发中），华为云……
+
+*   @蝎紫要补充点啥么？
+
+## 二次开发
+
+本次为全新开发，依赖[CloudOS](https://www.wolai.com/axNEMDh9YwpkFNfDn4238E "CloudOS")项目提供云系统支持，基于[OAuth2.0](https://www.wolai.com/jf79BakVdMJvUr2frkFtdV "OAuth2.0")协议[API文档](https://www.wolai.com/q12MGB4ZKRibF9xB8cuhcz "API文档")。
+
+## 其他资料
+
+[#Todo](https://www.wolai.com/g7XPXesQqtNDEwjKoxTE7q "#Todo")截图？视频？
+
+### 团队成员+特别感谢
+
+[@蝎紫](https://www.wolai.com/r3sYg3TTjEs4qJ7DwieDk8 "@蝎紫")
+
+***
+
+# 许可协议
+
+该参赛作品的源代码以`MIT`开源协议对外开源

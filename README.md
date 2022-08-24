@@ -44,6 +44,12 @@
 
 课前备课：[CloudOS-Flat-App 云教室](https://flat.app.cloudos.com/)
 
+#### 注：
+
+由于netless白板插件模式下没有老师和学生的身份，默认插件中的老师Uid为：`teacherUid`
+
+修改位置为：`/src/index.js > CloudClassApp > attributes`
+
 
 ## 功能简介
 
@@ -66,8 +72,6 @@
 *   后端：Vite+Node
 
 *   云端：阿里云（已支持），腾讯云（开发中），华为云……
-
-*   @蝎紫要补充点啥么？
 
 ## 二次开发
 

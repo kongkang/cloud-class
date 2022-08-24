@@ -173,8 +173,6 @@
 		return loadData();
 	};
 	const submitFn = () => {
-						emit("router", {router:"Home"});
-		return ;
 		api.practice.submit({ practiceId: practiceId.value }).then(
 			(res) => {
 				console.warn("submit", res);
@@ -183,7 +181,7 @@
 					emit("update:data", {
 						practice: practiceId.value,
 					});
-						emit("router", {router:"Home"});
+					emit("router", { router: "Home" });
 				} else {
 					$message.error(res.msg);
 				}

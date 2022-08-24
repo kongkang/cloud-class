@@ -10,7 +10,7 @@
 		<n-layout class="screen_right">
 			<n-layout-header class="screen_header">
 				<n-space justify="end" align="center">
-					<n-text>Screen: {{ data.uid }}</n-text>
+					<n-text>Playback: {{ data.uid }}</n-text>
                     <n-button @click="emit('router', { router: 'Dashboard' })" type="default"
                         >返回</n-button
                     >
@@ -46,7 +46,7 @@
 		NSpin,
 		useMessage,
 	} from "naive-ui";
-	import { api } from "@/components/API";
+	import { api, config } from "@/components/API";
 
 	const $message = useMessage();
 	onBeforeUnmount(() => {
@@ -74,7 +74,9 @@
 	const loadData = () => {
         console.warn("loadData", data.classObj.id);
         if (data.practiceObj.id) {
-            return $message.success("这里是回放");
+			isStart.value = true;
+			ccUrl.value = `${config.wwwUrl}/playback/${data.practiceObj.id}?flat=${data.uid}`;
+            return $message.success("读取中");
         }
         $message.warning("请先选定一位学生的作业。");
         return emit("router", { router: "Dashboard" });

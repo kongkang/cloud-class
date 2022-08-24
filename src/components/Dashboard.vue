@@ -31,7 +31,7 @@
 			show-size-picker
 			:page-sizes="[5, 10, 20, 30, 50]"
 		/>
-		<div v-if="data.isTeacher">connectionList:{{ connectionList }}</div>
+		<!-- <div v-if="data.isTeacher">connectionList:{{ connectionList }}</div> -->
 	</n-space>
 </template>
 
@@ -84,18 +84,18 @@
 						$message.error(err.msg);
 					}
 				);
-			api.cloudclass.connectionList({ cloudClassId: data.classObj.id }).then(
-				(list) => {
-					console.warn("connectionList", list);
-					connectionList.value = list;
-				},
-				(err) => {
-					if (err.code == 2002) {
-						return emit("router", { router: "Login", redirect: "Dashboard" });
-					}
-					$message.error(err.msg);
-				}
-			);
+			// api.cloudclass.connectionList({ cloudClassId: data.classObj.id }).then(
+			// 	(list) => {
+			// 		console.warn("connectionList", list);
+			// 		connectionList.value = list;
+			// 	},
+			// 	(err) => {
+			// 		if (err.code == 2002) {
+			// 			return emit("router", { router: "Login", redirect: "Dashboard" });
+			// 		}
+			// 		$message.error(err.msg);
+			// 	}
+			// );
 		} else {
 			api.practice
 				.list({

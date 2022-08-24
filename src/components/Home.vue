@@ -53,8 +53,8 @@
 				<n-space align="center">
 					<n-text type="default">课中操作：</n-text>
 					<template v-if="data.classObj.status == 0">
-						<n-button @click="startClassFn" type="warning" v-if="isStart"> 实操开机 </n-button>
-						<n-button @click="startPracticeFn" type="success"> 学生上机 </n-button>
+						<n-button @click="startClassFn" type="warning" v-if="!isStart"> 实操开机 </n-button>
+						<n-button @click="startPracticeFn" type="success" v-else> 学生上机 </n-button>
 					</template>
 					<template v-if="data.classObj.status == 1">
 						<n-button @click="endClassFn" type="error"> 结束实操 </n-button>
@@ -67,7 +67,7 @@
 				</n-space>
 				<n-space align="center" v-if="hasClassId && data.classObj.status == 2">
 					<n-text type="default">课后作业：</n-text>
-					<n-button @click="afterClassFn" type="success"> 授权作业 </n-button>
+					<n-button @click="afterClassFn" type="success"> 课后作业 </n-button>
 				</n-space>
 			</template>
 		</template>
@@ -94,6 +94,9 @@
 				<n-button type="info" @click="watchClassFn">查看作业</n-button>
 			</n-space>
 		</template>
+		<n-alert title="实操要点" type="info" v-if="data.classObj">
+			<div v-html="data.classObj.homework.content"></div>
+		</n-alert>
 	</n-space>
 </template>
 
@@ -246,7 +249,8 @@
 		emit("router", { router: "Dashboard" });
 	};
 	const afterClassFn = (v) => {
-		emit("router", { router: "Screen" });
+		// emit("router", { router: "Screen" });
+		$message.success("即将更新");
 	};
 
 	const startPracticeFn = (v) => {

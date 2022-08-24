@@ -20,8 +20,8 @@
 					<n-button type="info" @click="watchFn" v-if="practice.status == 0">
 						观察
 					</n-button>
-					<n-button type="primary" @click="commentFn" v-if="practice.status == 1">
-						批改
+					<n-button type="primary" @click="commentFn">
+						评价
 					</n-button>
 					<n-button type="primary" @click="playbackFn" v-if="practice.status == 1">
 						看回放
@@ -30,7 +30,9 @@
 				<n-text v-if="practice.status == 2">
 					批语：{{ practice.comment }}
 				</n-text>
-				<n-text v-else>等待反馈</n-text>
+				<n-text v-else>
+					<n-tag>等待反馈</n-tag>
+				</n-text>
 			</n-space>
 		</template>
 	</n-card>
@@ -44,6 +46,7 @@
 		NButton,
 		NSpace,
 		NText,
+		NTag,
 		useDialog,
 		useMessage,
 		NInput,
@@ -65,7 +68,7 @@
 			practiceObj: practice.value,
 		});
 		$emit("router", {
-			router: "Screen",
+			router: "Playback",
 		});
 	};
 	const playbackFn = () => {

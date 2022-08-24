@@ -1,6 +1,6 @@
 export const config = {
-    baseUrl: "https://beta.cloudos.com:10248",
-    wwwUrl: "https://local.cloudos.com:3002",
+    baseUrl: "https://netless.app.cloudos.com:10240",
+    wwwUrl: "https://flat.app.cloudos.com",
     timeout: 3000,
     api: {
         userinfo: {

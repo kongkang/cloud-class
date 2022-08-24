@@ -15,21 +15,22 @@
 			<n-text>状态：{{ practice.status }}</n-text>
 		</n-space>
 		<template #action>
-			<n-space v-if="isTeacher">
-				<n-button type="info" @click="watchFn" v-if="practice.status == 0">
-					观察
-				</n-button>
-				<n-button type="primary" @click="commentFn" v-if="practice.status == 1">
-					批改
-				</n-button>
-				<n-button type="primary" @click="playbackFn" v-if="practice.status == 1">
-					看回放
-				</n-button>
-			</n-space>
-			<n-space v-else>
+			<n-space>
+				<template v-if="isTeacher">
+					<n-button type="info" @click="watchFn" v-if="practice.status == 0">
+						观察
+					</n-button>
+					<n-button type="primary" @click="commentFn" v-if="practice.status == 1">
+						批改
+					</n-button>
+					<n-button type="primary" @click="playbackFn" v-if="practice.status == 1">
+						看回放
+					</n-button>
+				</template>
 				<n-text v-if="practice.status == 2">
 					批语：{{ practice.comment }}
 				</n-text>
+				<n-text v-else>等待反馈</n-text>
 			</n-space>
 		</template>
 	</n-card>
@@ -91,8 +92,8 @@
 			positiveText: "确定",
 			onPositiveClick() {
 				api.practice.comment({practiceId: practice.value.id, comment: comment.value}).then((res)=>{
-					emit("update:data", {
-						"comment": res
+					$emit("update:data", {
+						"practice": practice.value.id
 					});
 				})
 			},

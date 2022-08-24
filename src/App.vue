@@ -20,6 +20,15 @@
 						})
 					}}</n-tag
 				>
+				<n-dropdown
+					trigger="click"
+					:options="routerOpt"
+					route
+					@select="pubRouterFn"
+					v-if="isTeacher && routerOpt.length"
+				>
+					<n-button class="allToRouter">全员跳转</n-button>
+				</n-dropdown>
 				<component
 					:is="router"
 					:data="{
@@ -54,6 +63,8 @@
 		NConfigProvider,
 		NTag,
 		NSpace,
+		NDropdown,
+		NButton,
 		lightTheme,
 		darkTheme,
 		zhCN,
@@ -93,21 +104,39 @@
 		Playback,
 		Dashboard,
 	};
+	const routerOpt = computed(() => {
+		let arr = [
+			{
+				label: "首页",
+				key: "Home",
+			},
+		];
+		if (real_classObj.value.status == 1) {
+			arr.push({
+				label: "上机",
+				key: "Screen",
+			});
+		} else if (real_classObj.value.status == 2) {
+			arr.push({
+				label: "作业列表",
+				key: "Dashboard",
+			});
+		}
+		if (real_practiceObj.value.id) {
+			arr.push({
+				label: "回放",
+				key: "Playback",
+			});
+		}
+		return arr;
+	});
 	const router = computed({
 		get() {
-			if (
-				real_router.value != "Login" &&
-				!isTeacher.value &&
-				classObj.value.status == 1
-			) {
-				return Screen;
-			}
 			return actions[real_router.value];
 		},
 		set(v) {
 			if (v) {
 				real_router.value = v;
-				$store.setState({ router: v });
 			}
 		},
 	});
@@ -141,6 +170,15 @@
 			console.warn("classObj:", v);
 			real_classObj.value = v;
 			$store.setState({ classObj: v });
+			switch (v.status) {
+				case 1:
+					$store.setState({ router: "Screen" });
+					break;
+				case 0:
+				case 2:
+					$store.setState({ router: "Home" });
+					break;
+			}
 		},
 	});
 	const practiceObj = computed({
@@ -160,6 +198,11 @@
 		},
 	});
 
+	const pubRouterFn = (v) => {
+		console.log(v);
+		router.value = v;
+		$store.setState({ router: v });
+	};
 	const routerFn = (action) => {
 		console.warn("routerFn-1", action);
 		if (!actions[action.router]) {
@@ -180,16 +223,8 @@
 		if (v.practiceObj !== undefined) {
 			practiceObj.value = v.practiceObj;
 		}
-		if (v.practice) {
+		if (v.practice !== undefined) {
 			console.log(v.practice);
-		}
-		if (v.comment) {
-			$store.setState({
-				'action': {
-					type: 'checkPractice',
-					value: v.comment
-				}
-			});
 		}
 		if (v.token) {
 			setToken(v.token)
@@ -240,6 +275,12 @@
 		height: auto;
 		text-align: left;
 		pointer-events: none;
+		display: none;
+	}
+	.allToRouter {
+		position: absolute;
+		right: 10px;
+		top: 10px;
 	}
 	.testData {
 		left: auto;

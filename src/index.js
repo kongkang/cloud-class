@@ -12,7 +12,7 @@ const CloudClassApp = {
         title: 'CloudOS-云教室'
     },
     attributes: {
-        teacherUid: 'kongkang'
+        teacherUid: 'teacherUid'
     },
     setup(context) {
         console.warn('init?');

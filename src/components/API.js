@@ -1,6 +1,8 @@
+const baseUrl = import.meta.env.MODE == 'development' ? "https://beta.cloudos.com:10248" : "https://netless.app.cloudos.com:10240";
+const wwwUrl = import.meta.env.MODE == 'development' ? "https://local.cloudos.com:3001" : "https://flat.app.cloudos.com";
 export const config = {
-    baseUrl: "https://netless.app.cloudos.com:10240",
-    wwwUrl: "https://flat.app.cloudos.com",
+    baseUrl,
+    wwwUrl,
     timeout: 3000,
     api: {
         userinfo: {
@@ -10,6 +12,7 @@ export const config = {
             list: '/homework/list',
         },
         cloudclass: {
+            get: '/cloudclass/info',
             list: '/cloudclass/list',
             start: '/cloudclass/start',
             end: '/cloudclass/end',
@@ -17,6 +20,7 @@ export const config = {
             connectionList: '/cloudclass/connectionList',
         },
         practice: {
+            list: '/practice/studyList',
             start: '/practice/start',
             submit: '/practice/submit',
             comment: '/practice/comment',
@@ -97,6 +101,9 @@ export const api = {
         }
     },
     cloudclass: {
+        get: ({ cloudClassId }) => {
+            return requestAPI("get", config.api.cloudclass.get, { cloudClassId }).then(checkApiData);
+        },
         list: ({ homeworkId }) => {
             return requestAPI("get", config.api.cloudclass.list, { homeworkId }).then(checkApiData);
         },
@@ -114,14 +121,17 @@ export const api = {
         }
     },
     practice: {
+        list: ({ pageSize, pageIndex, status, cloudClassId }) => {
+            return requestAPI('get', config.api.practice.list, { pageSize, pageIndex, status, cloudClassId }).then(checkApiData);
+        },
         join: ({ cloudClassId }) => {
             return requestAPI("post", config.api.practice.start, { cloudClassId }).then(checkApiData);
         },
         submit: ({ practiceId }) => {
             return requestAPI("post", config.api.practice.submit, { practiceId }).then(checkApiData);
         },
-        comment: ({practiceId, comment}) => {
-            return requestAPI("post", config.api.practice.comment, {practiceId, comment}).then(checkApiData);
+        comment: ({ practiceId, comment }) => {
+            return requestAPI("post", config.api.practice.comment, { practiceId, comment }).then(checkApiData);
         },
         acquireConnect: ({ practiceId }) => {
             return requestAPI("post", config.api.practice.acquireConnect, { practiceId }).then(checkApiData);
@@ -132,7 +142,6 @@ export const api = {
     }
 };
 
-// http://localhost:3001/login?uid=kongkang
 export const isApiLogin = async () => {
     return api.userinfo.detail().then(data => {
         console.log(data);

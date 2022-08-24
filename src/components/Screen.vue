@@ -13,8 +13,12 @@
 					<n-text>Screen: {{ data.uid }}</n-text>
 					<n-space v-if="!data.isTeacher">
 						<n-button @click="submitFn" type="primary">提交作业</n-button>
-						<n-button @click="connectionFn" type="info" secondary>申请连线</n-button>
-						<n-button @click="rebootFn" type="error" tertiary>重新连接</n-button>
+						<n-button @click="connectionFn" type="info" secondary
+							>申请连线</n-button
+						>
+						<n-button @click="rebootFn" type="error" tertiary
+							>重新连接</n-button
+						>
 					</n-space>
 					<n-space v-else>
 						<n-button @click="emit('router', { router: 'Home' })" type="default"
@@ -106,7 +110,7 @@
 								practiceId.value = res.id;
 								ccUrl.value = res.url;
 								emit("update:data", {
-									practice: res
+									practice: res,
 								});
 							}
 						},
@@ -159,29 +163,35 @@
 		screenRef.value.classList.remove("focus");
 	};
 	const connectionFn = () => {
-		api.practice
-			.acquireConnect({ practiceId: practiceId.value })
-			.then(console.warn);
+		api.practice.acquireConnect({ practiceId: practiceId.value }).then((res) => {
+			emit("update:data", {
+				connection: res.id,
+			});
+		});
 	};
 	const rebootFn = () => {
 		return loadData();
 	};
 	const submitFn = () => {
-		api.practice
-			.submit({ practiceId: practiceId.value })
-			.then(
-				(res) => {
-					console.warn("submit", res);
-					if (res.code === 0) {
-						$message.success("提交成功");
-						emit("update:data", {
-							practice: res.data,
-						});
-					} else {
-						$message.error(res.msg);
-					}
+						emit("router", {router:"Home"});
+		return ;
+		api.practice.submit({ practiceId: practiceId.value }).then(
+			(res) => {
+				console.warn("submit", res);
+				if (res.code === 0) {
+					$message.success("提交成功");
+					emit("update:data", {
+						practice: practiceId.value,
+					});
+						emit("router", {router:"Home"});
+				} else {
+					$message.error(res.msg);
 				}
-			);
+			},
+			(err) => {
+				$message.error(err.msg);
+			}
+		);
 	};
 </script>
 
@@ -210,7 +220,8 @@
 		overflow: auto;
 		margin-top: 40px;
 		z-index: 0;
-		.n-spin-container, iframe {
+		.n-spin-container,
+		iframe {
 			width: 100%;
 			height: 100%;
 		}

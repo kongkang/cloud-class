@@ -1,7 +1,7 @@
 <template>
 	<n-space vertical class="testWrap">
 		<template v-if="data.isTeacher">
-			<h1>云教室：课前准备</h1>
+			<h1>云教室：老师端{{isStart}}</h1>
 			<n-alert
 				:type="
 					(classStatusArr[data.classObj.status] &&
@@ -53,7 +53,7 @@
 				<n-space align="center">
 					<n-text type="default">课中操作：</n-text>
 					<template v-if="data.classObj.status == 0">
-						<n-button @click="startClassFn" type="warning"> 实操开机 </n-button>
+						<n-button @click="startClassFn" type="warning" v-if="isStart"> 实操开机 </n-button>
 						<n-button @click="startPracticeFn" type="success"> 学生上机 </n-button>
 					</template>
 					<template v-if="data.classObj.status == 1">
@@ -72,7 +72,7 @@
 			</template>
 		</template>
 		<template v-else>
-			<h1>云教室</h1>
+			<h1>云教室：学生端</h1>
 			<n-alert
 				:type="
 					(classStatusArr[data.classObj.status] &&
@@ -89,6 +89,9 @@
 			</n-alert>
 			<n-space v-if="data.classObj.status == 1">
 				<n-button type="warning" @click="startPracticeFn">开始实操</n-button>
+			</n-space>
+			<n-space v-if="data.classObj.status == 2">
+				<n-button type="info" @click="watchClassFn">查看作业</n-button>
 			</n-space>
 		</template>
 	</n-space>
@@ -116,7 +119,7 @@
 			msg: "实操课，练习中",
 		},
 		2: {
-			type: "error",
+			type: "warning",
 			msg: "练习结束，等待点评",
 		},
 	};
@@ -191,15 +194,32 @@
 		if (!data.value.isTeacher) {
 			return $message.info("只有老师才可以操作");
 		}
+		isStart.value = v.status == 1;
 		console.log({ v, opt });
 		emit("update:data", { classObj: opt.data });
 	};
 
+	const isStart = ref(false);
+	const loadData = ()=>{
+		if (!data.value.isTeacher){
+			return false;
+		}
+		api.cloudclass
+			.get({ cloudClassId: data.value.classObj.id })
+			.then((res) => {
+				isStart.value = res.status == 1;
+			})
+			.catch((err) => {
+				console.log(err);
+				$message.error(err.msg);
+			});
+	};
+	loadData();
 	const startClassFn = (v) => {
 		api.cloudclass
 			.start({ cloudClassId: data.value.classObj.id })
 			.then((res) => {
-				console.log(res);
+				isStart.value = true;
 				$message.success("正在开机");
 			})
 			.catch((err) => {

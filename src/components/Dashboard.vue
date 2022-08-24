@@ -1,9 +1,11 @@
 <template>
 	<n-space vertical style="padding: 20px">
-		<n-button @click="emit('router', { router: 'Home' })" type="warning"
-			>返回（Home）</n-button
-		>
-		<n-tabs type="line" v-model:value="status">
+		<n-space>
+			<n-button @click="emit('router', { router: 'Home' })" type="warning"
+				>返回（Home）</n-button
+			>
+		</n-space>
+		<n-tabs type="line" v-model:value="status" v-if="data.isTeacher">
 			<n-tab :name="-1">全部</n-tab>
 			<n-tab :name="0">作业中</n-tab>
 			<n-tab :name="1">已提交作业：未反馈</n-tab>
@@ -11,7 +13,12 @@
 		</n-tabs>
 		<n-grid :cols="12" x-gap="20" y-gap="20">
 			<n-gi :span="4" v-for="practice in practiceList" :key="practice.id">
-				<practice-card :data="practice" :isTeacher="data.isTeacher" @update:data="emitFn" @router="emitFn"></practice-card>
+				<practice-card
+					:data="practice"
+					:isTeacher="data.isTeacher"
+					@update:data="emitFn"
+					@router="emitFn"
+				></practice-card>
 			</n-gi>
 		</n-grid>
 		<n-alert type="info" v-if="practiceList.length == 0">无数据</n-alert>
@@ -24,7 +31,7 @@
 			show-size-picker
 			:page-sizes="[5, 10, 20, 30, 50]"
 		/>
-		<div>connectionList:{{connectionList}}</div>
+		<div v-if="data.isTeacher">connectionList:{{ connectionList }}</div>
 	</n-space>
 </template>
 
@@ -38,11 +45,13 @@
 		NGi,
 		NAlert,
 		NPagination,
+		useMessage,
 	} from "naive-ui";
 	import { isLogin, api } from "@/components/API";
 	import practiceCard from "@/components/practice-card.vue";
 	import { ref, computed, watch } from "vue";
 
+	const $message = useMessage();
 	const emit = defineEmits(["router", "update:data"]);
 	const { data } = defineProps({
 		data: Object,
@@ -56,34 +65,64 @@
 	});
 	const status = ref(-1);
 	const loadData = () => {
-		api.cloudclass
-			.practiceList({
-				cloudClassId: data.classObj.id,
-				status: status.value > -1 ? status.value : undefined,
-			})
-			.then(
+		if (data.isTeacher) {
+			api.cloudclass
+				.practiceList({
+					cloudClassId: data.classObj.id,
+					status: status.value > -1 ? status.value : undefined,
+				})
+				.then(
+					(list) => {
+						console.warn("practiceList", list);
+						practiceList.value = list.result;
+						paginate.value = list.paginate;
+					},
+					(err) => {
+						if (err.code == 2002) {
+							return emit("router", { router: "Login", redirect: "Dashboard" });
+						}
+						$message.error(err.msg);
+					}
+				);
+			api.cloudclass.connectionList({ cloudClassId: data.classObj.id }).then(
 				(list) => {
-					console.warn("practiceList", list);
-					practiceList.value = list.result;
-					paginate.value = list.paginate;
+					console.warn("connectionList", list);
+					connectionList.value = list;
 				},
 				(err) => {
-					emit("router", { router: "Login", redirect: "Dashboard" });
+					if (err.code == 2002) {
+						return emit("router", { router: "Login", redirect: "Dashboard" });
+					}
+					$message.error(err.msg);
 				}
 			);
-		api.cloudclass.connectionList({ cloudClassId: data.classObj.id }).then((list) => {
-			console.warn("connectionList", list);
-			connectionList.value = list;
-		}, err=>{
-			emit("router", { router: "Login", redirect: "Dashboard" });
-		});
+		} else {
+			api.practice
+				.list({
+					cloudClassId: data.classObj.id,
+					status: status.value > -1 ? status.value : undefined,
+				})
+				.then(
+					(list) => {
+						console.warn("practiceList", list);
+						practiceList.value = list.result;
+						paginate.value = list.paginate;
+					},
+					(err) => {
+						if (err.code == 2002) {
+							return emit("router", { router: "Login", redirect: "Dashboard" });
+						}
+						$message.error(err.msg);
+					}
+				);
+		}
 	};
 	const emitFn = (v) => {
 		console.log(v);
-		if (v.practiceObj){
+		if (v.practiceObj) {
 			emit("update:data", v);
 		}
-		if (v.router){
+		if (v.router) {
 			emit("router", v);
 		}
 	};
